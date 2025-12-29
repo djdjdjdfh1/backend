@@ -41,6 +41,8 @@ async def product_create(request):
         if form.is_valid():
             # 폼에서 데이터 추출
             data = form.cleaned_data
+            # Decimal을 float로 변환
+            data['price'] = float(data['price'])
             result = await create_product(data)
             if result:
                 messages.success(request, '제품이 성공적으로 생성되었습니다.')
