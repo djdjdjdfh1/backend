@@ -1,0 +1,30 @@
+from pydantic import BaseModel # 모든 스키마의 기본 클래스
+from typing import Optional # 선택필드
+from datetime import datetime
+
+# 공통필드
+class ProductBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    stock: int
+
+# 생성용 스키마
+# 생성시에만 필요한 스키마
+class ProductCreate(ProductBase):
+    pass
+
+# 수정용 스키마
+class ProductUpdate(ProductBase):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
+
+# 응답 스키마
+class Product(ProductBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    class Config:
+        orm_mode = True  # ORM 모델과 호환되도록 설정
