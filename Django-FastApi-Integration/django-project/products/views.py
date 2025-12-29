@@ -53,7 +53,34 @@ async def product_create(request):
 
 
 async def product_edit(request, product_id):
-    pass
+    if request.method == 'GET':
+        form = ProductForm()
+    elif request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            # 폼에서 데이터 추출
+            data = form.cleaned_data
+            # Decimal을 float로 변환
+            data['price'] = float(data['price'])
+            async with httpx.AsyncClient() as client:
+                try:
+                    response = await client.put(f'{FASTAPI_URL}/api/products/{product_id}', json=data)
+                    response.raise_for_status()
+                    messages.success(request, '제품이 성공적으로 수정되었습니다.')
+                    return redirect('products:product_list')
+                except httpx.HTTPError as e:
+                    messages.error(request, '제품 수정에 실패했습니다.')
+                    print(f"Error updating product: {e}")
+    return render(request, 'products/product_form.html', {'form': form,'title':'제품수정'})
+
 
 async def product_delete(request, product_id):
-    pass
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.delete(f'{FASTAPI_URL}/api/products/{product_id}')
+            response.raise_for_status()
+            messages.success(request, '제품이 성공적으로 삭제되었습니다.')
+        except httpx.HTTPError as e:
+            messages.error(request, '제품 삭제에 실패했습니다.')
+            print(f"Error deleting product: {e}")
+    return redirect('products:product_list')
