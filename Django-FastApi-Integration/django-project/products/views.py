@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
 import httpx
-from .forms import ProductForm
+from .forms import ProductForm, UserRegistationForm
 from django.contrib import messages
 # Create your views here.
 
@@ -96,17 +96,36 @@ async def product_edit(request, product_id):
 
 async def product_delete(request, product_id):
     # 해당 아이디의 제품이 있는지 확인하고 삭제 요청을 FastAPI로 보냄
-    product = await get_product(product_id)
+    product = await get_product(product_id)    
     if not product:
         messages.error(request, '제품을 찾을 수 없습니다.')
-        return redirect('products:product_list')
+        return redirect('products:product_list')    
     if request.method == 'POST':
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.delete(f'{FASTAPI_URL}/api/products/{product_id}')
                 response.raise_for_status()
                 messages.success(request, '제품이 성공적으로 삭제되었습니다.')
+                return redirect('products:product_list')
             except httpx.HTTPError as e:
-                print(f"Error deleting product: {e}")
                 messages.error(request, '제품 삭제에 실패했습니다.')
-        return redirect('products:product_list')
+                return False
+            
+
+################################################ 인증 #################################
+def register_view(request):
+    '''회원가입'''             
+    if request.method=='POST':
+        form = UserRegistationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)  # form데이터 기반으로 user 객체를 생성
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('login')
+    else:
+        form = UserRegistationForm()
+    return render(request,'registration/register.html',{'form':form,'title':'회원가입'})
+
+
+
+
