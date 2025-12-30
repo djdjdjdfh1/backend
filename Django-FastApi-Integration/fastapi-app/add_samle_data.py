@@ -1,5 +1,5 @@
 """
-FastAPI 데이터베이스에 샘플 데이터를 추가하는 스크립트
+FastAPI 데이터베이스에 샘플 사용자 및 제품 데이터를 추가하는 스크립트
 """
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
