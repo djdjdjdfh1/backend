@@ -105,3 +105,119 @@ nano 에디터
 - 잘라내기 : Ctrl+k (한줄 삭제/ 잘라내기)
 - 검색 : Ctrl+w  누르고 찾을 단어 입력
 - 저장 및 종료 : Ctrl+o(Write out) -> Enter -> Ctrl+x(Exit)
+
+### 12. 로그 실시간 감시
+- touch access.log
+- tail -f access.log      # 파일에 내용이 추가될 때마다 실시간으로 화면에 출력
+
+```
+실습:
+Nano를 사용하여 diary.txt를 만드세요.
+내용에 "Today is Monday"를 적고, 그 줄을 복사해서 5번 붙여넣으세요.
+3번째 줄의 "Monday"를 "Friday"로 수정하세요.
+저장 후 빠져나와 cat으로 내용을 확인하세요.
+head 명령어를 써서 이 파일의 앞 3줄만 출력해보세요.
+```
+
+### 13. Grep & Find
+``` 
+샘플 데이터
+echo -e "Apple\nBanana\nCherry\nDate\nElderberry" > fruits.txt
+echo -e "Error: 404\nInfo: Login success\nError: 500\nWarn: Low disk" > server.log
+```
+- grep "Apple" fruits.txt         # 기본 검색
+- grep -i "apple" fruits.txt      # 대소문자 무시 (-i)
+- grep -v "Error" server.log      # "Error"가 *없는* 줄만 출력 (-v: 반전)
+- grep -n "Error" server.log      # 몇 번째 줄인지 줄 번호 표시 (-n)
+- grep -c "Error" server.log      # 매칭되는 줄의 개수 카운트 (-c)
+- grep "^Error" server.log        # "Error"로 *시작하는* 줄만 검색 (정규식 ^)
+
+```
+find 명령어
+```
+- find /etc -name "*.conf"        # /etc 아래 확장자가 .conf인 모든 파일 찾기
+- find /usr -size +10M            # 10MB보다 큰 파일 찾기
+- find . -type d                  # 현재 경로 아래의 '디렉토리'만 찾기
+- find . -name "fruits.txt" -delete # 찾아서 바로 삭제 (주의!)
+
+```
+파이프 응용
+```
+# /etc 디렉토리 파일 중 'conf'가 들어가는 파일 개수 세기
+- ls /etc | grep "conf" | wc -l
+
+# 프로세스 목록 중 'bash'만 찾아서 보기
+- ps aux | grep bash
+
+```
+/var 디렉토리 전체에서 이름에 log가 들어가는 파일을 찾으세요.
+위에서 찾은 파일 중, 파일 크기가 1kbyte 이상인 것만 찾아보세요. (find /var -name "*log*" -size +1k)
+ls -al /etc 명령어의 결과에서 "root"라는 단어가 몇 번 나오는지 파이프와 grep -c를 이용해 한 줄 명령어로 구하세요.
+```
+
+```
+cat << EOF > grep_practice.txt
+Apple Pie
+Banana Split
+Cherry Cake
+apple juice
+Banana Bread
+Date 2024
+Error: File not found
+Error: Access denied
+Warning: Disk full
+Info: Update completed
+EOF
+```
+
+| 옵션 | 설명 | 기억법 |
+| :--- | :--- | :--- |
+| `-i` | 대소문자 무시 | **I**gnore case |
+| `-v` | 패턴 제외 (반전) | In**V**ert |
+| `-n` | 줄 번호 표시 | **N**umber |
+| `-r` | 하위 폴더 포함 검색 | **R**ecursive |
+| `-c` | 개수 카운트 | **C**ount |
+| `-l` | 파일명만 출력 | **L**ist file |
+| `^` | 라인의 시작 | (Shift+6) |
+| `$` | 라인의 끝 | (Shift+4) |
+
+### 14. 권한
+```
+# 실습용 파일 생성
+touch secret.txt
+ls -l secret.txt
+```
+| 구분 | 권한(User) | 권한(Group) | 권한(Others) | 링크수 | 소유자 | 그룹 | 크기 | 날짜 | 이름 |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `-` | `rw-` | `r--` | `r--` | `1` | `root` | `root` | `0` | ... | `secret.txt` |
+*(맨 앞이 `d`면 디렉토리, `-`면 파일입니다)*
+
+2진수 비트 계산(r=4, w=2, x=1)을 사용합니다.
+
+| 권한 조합 | 숫자 | 의미 |
+|:---:|:---:|:---|
+| `rwx` | 4+2+1 = **7** | 읽고 쓰고 실행 가능 (관리자 권한) |
+| `rw-` | 4+2+0 = **6** | 읽고 쓰기 가능 (일반 파일 표준) |
+| `r-x` | 4+0+1 = **5** | 읽고 실행 가능 (일반 프로그램/폴더 표준) |
+| `r--` | 4+0+0 = **4** | 읽기만 가능 (중요 설정 파일) |
+| `---` | 0+0+0 = **0** | 아무것도 못함 (접근 금지) |
+
+#### 권한변경 - 숫자모드
+```
+chmod 777 secret.txt  # rwxrwxrwx (누구나 다 가능 - 보안 위험!)
+ls -l secret.txt
+
+chmod 755 secret.txt  # rwxr-xr-x (주인은 맘대로, 남들은 실행/읽기만)
+ls -l secret.txt
+
+chmod 600 secret.txt  # rw------- (나만 읽고 쓰기 - 개인키/비번 파일 필수)
+ls -l secret.txt
+```
+
+#### 권한변경 - 심볼릭모드
+```
+chmod u+x secret.txt  # User에게 eXecute 권한 추가
+chmod g-w secret.txt  # Group에게 Write 권한 제거
+chmod o=r secret.txt  # Others는 Read만 가능하게 고정
+chmod a-r secret.txt  # All(모두)에게서 Read 권한 뺏기 (나도 못 읽음!)
+```
