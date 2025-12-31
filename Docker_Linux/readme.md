@@ -250,11 +250,85 @@ ls -l /var/www/html/index.html
 ```
 
 ### 15. 시스템 관리자 와 패키지
-패키지 관리 라이브러리
+패키지 관리 라이브러리 라이프사이클
 ```
 apt update                      # 서버에서 최신 패키지 정보를 가져옴
 apt install htop curl tree -y   # htop, curl, tree 설치
 apt remove tree                 # tree 삭제 (설정 파일은 남음)
 apt purge tree                  # tree 완전 삭제 (설정 파일 포함)
 apt autoremove                  # 쓰지 않는 의존성 패키지 자동 정리
+```
+시스템 상태 확인
+```
+top -b -n 1                     # 현재 시스템 상태 스냅샷 (CPU, 메모리)
+htop                            # 컬러풀한 그래픽 모드 (F10 또는 q로 종료)
+df -h                           # 디스크 용량 확인 (Disk Free) -h: Human readable
+du -sh /var/log                 # 특정 디렉토리의 용량 확인 (Disk Usage)
+free -h                         # 남은 메모리(RAM) 확인
+```
+프로제스 제어
+```
+# 백그라운드에서 오래 도는 프로세스 시뮬레이션
+sleep 1000 &                    # 1000초 동안 대기하는 명령을 백그라운드(&) 실행
+ps aux | grep sleep             # sleep 프로세스 찾기 (PID 확인)
+
+# 프로세스 강제 종료 (PID가 1234라면)
+# kill 1234
+# kill -9 1234                  # 말을 안 들으면 강제 종료 (-9)
+pkill sleep                     # 이름으로 바로 종료
+```
+
+```
+실습:
+ncdu라는 디스크 사용량 분석 도구를 apt로 설치해보세요.
+설치된 ncdu를 실행하여 현재 디렉토리(/)의 용량 분포를 확인하고 종료(q)하세요.
+현재 실행 중인 프로세스 중 메모리를 가장 많이 사용하는 프로세스 상위 5개를 출력하는 명령어를 찾아보세요. 
+(힌트: ps 명령어의 정렬 옵션 또는 top 사용)
+```
+
+### 16. 쉘 스크립트 프로그래밍(Shell Scripting)
+```
+Shebang (#!/bin/bash): 스크립트 첫 줄에 필수. 어떤 쉘로 실행할지 지정.
+```
+
+nano hello.sh
+```
+#!/bin/bash
+NAME="LinuxUser"              # 변수 지정 (공백 없어야 함)
+echo "Hello, $NAME!"
+echo "오늘 날짜는 $(date) 입니다." # 명령어 결과 넣기 $()
+
+echo -n "당신의 이름은? "
+read USER_INPUT               # 사용자 입력 받기
+echo "반갑습니다, $USER_INPUT 님."
+```
+chmod +x hello.sh
+
+./hello.sh
+
+#### 조건문(check_file.sh)
+```
+#!/bin/bash
+FILE='mylog.txt'
+if [ -f "$FILE" ]; then
+        echo "$FILE is exist"
+        cat $FILE
+else
+        echo "$FILE is not exist, and create that"
+        touch $FILE
+fi
+
+chmod +x check_file.sh
+./check_file.sh
+```
+#### 순환문
+```
+#!/bin/bash
+for i in {1..5}
+do
+        echo "work file $i created...."
+        touch "job_$i.data"
+        sleep 0.5
+done
+ls *.data
 ```
