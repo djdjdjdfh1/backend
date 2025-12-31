@@ -221,3 +221,40 @@ chmod g-w secret.txt  # Group에게 Write 권한 제거
 chmod o=r secret.txt  # Others는 Read만 가능하게 고정
 chmod a-r secret.txt  # All(모두)에게서 Read 권한 뺏기 (나도 못 읽음!)
 ```
+
+```
+# 실습용 사용자 추가
+useradd -m developer
+
+# 파일 소유자를 developer로 변경
+chown developer secret.txt
+ls -l secret.txt       # 소유자가 root -> developer로 바뀜
+
+# 소유자와 그룹을 동시에 변경 (사용자:그룹)
+chown root:root secret.txt
+```
+
+```
+mkdir -p /var/www/html
+touch /var/www/html/index.html
+
+# 디렉토리는 755 (누구나 들어올 수 있음)
+chmod 755 /var/www/html
+
+# 파일은 644 (누구나 읽을 수 있음)
+chmod 644 /var/www/html/index.html
+
+# 확인
+ls -ld /var/www/html
+ls -l /var/www/html/index.html
+```
+
+### 15. 시스템 관리자 와 패키지
+패키지 관리 라이브러리
+```
+apt update                      # 서버에서 최신 패키지 정보를 가져옴
+apt install htop curl tree -y   # htop, curl, tree 설치
+apt remove tree                 # tree 삭제 (설정 파일은 남음)
+apt purge tree                  # tree 완전 삭제 (설정 파일 포함)
+apt autoremove                  # 쓰지 않는 의존성 패키지 자동 정리
+```
