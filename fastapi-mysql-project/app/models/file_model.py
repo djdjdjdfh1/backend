@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from app.models.base import Base
 
 class UploadedFile(Base):
-    tablename = "uploaded_files"
+    __tablename__ = "uploaded_files"
 
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String(255), nullable=False)      # 원본 파일명
