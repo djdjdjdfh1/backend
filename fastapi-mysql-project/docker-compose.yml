@@ -1,6 +1,6 @@
 # 최상위 섹션
-  # service : 실행할 컨테이너 정의(db, app, web and ...)
-  # volumns : 데이터 저장소 정의
+  # service : 실행할 컨테이너 정의(db,app,web  and so on ...)
+  # volumes : 데이터 저장소 정의
   # networks : 컨테이너 간 통신을 위한 가상 네트워크 정의
 
 services:
